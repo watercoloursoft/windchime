@@ -1,0 +1,17 @@
+{
+    "name": "watercoloursoft.windchime.Tests",
+    "rootNamespace": "",
+    "references": [
+        "GUID:56760747dcb7f67458887ac7d77b7e51",
+        "GUID:ab5eeb87bde94cb478b463047b975436"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
