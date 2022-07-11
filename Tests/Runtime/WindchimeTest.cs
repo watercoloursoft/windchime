@@ -1,32 +1,30 @@
-﻿using System;
-using UnityEngine;
-using UnityEngine.Serialization;
-using UnityEngine.UIElements;
+﻿using UnityEngine;
 using Windchime.Runtime;
 
 namespace Windchime.Tests.Runtime
 {
-    public class WindchimeTest : ReactiveBehaviour
+    public class WindchimeTest : MonoBehaviour
     {
-        private readonly State<int> _amount = new(0);
-        private float _elapsed = 0;
+        [SerializeField] private SpriteRenderer _spriteRenderer;
+        
+        private float _elapsed;
 
-        private new void Start()
-        {
-            base.Start();
-        }
+        private bool _isShaded;
 
+        private Color NORMAL_COLOR = Color.HSVToRGB(0.5f, 0.5f, 1f);
+        private Color SHADED_COLOR = Color.HSVToRGB(0.8f, 0.5f, 1f);
+        
         private void Update()
         {
             _elapsed += Time.deltaTime;
             if (!(_elapsed > 1)) return;
-            _amount.Update(x => x + 1);
             _elapsed--;
-        }
-
-        protected override void Reactive()
-        {
-            Debug.Log("Elapsed: " + _amount.Get() + "s");
+            _isShaded = !_isShaded;
+            var _ = new Tween<Color>(
+                () => _spriteRenderer.color, 
+                x => _spriteRenderer.color = x, 
+                _isShaded ? SHADED_COLOR : NORMAL_COLOR, 
+                new TweenInfo {Time = 0.5f});
         }
     }
 }
