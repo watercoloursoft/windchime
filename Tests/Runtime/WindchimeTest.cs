@@ -3,16 +3,23 @@ using Windchime.Runtime;
 
 namespace Windchime.Tests.Runtime
 {
+    public static class SpriteRendererExtension
+    {
+        public static Tween<Color> TweenColor(this SpriteRenderer spriteRenderer, Color to, TweenInfo info)
+        {
+            var tween = TweenScheduler.Play(() => spriteRenderer.color, value => spriteRenderer.color = value, to, info);
+            return tween;
+        }
+    }
+    
     public class WindchimeTest : MonoBehaviour
     {
-        [SerializeField] private SpriteRenderer _spriteRenderer;
-        
         private float _elapsed;
 
         private bool _isShaded;
 
-        private Color NORMAL_COLOR = Color.HSVToRGB(0.5f, 0.5f, 1f);
-        private Color SHADED_COLOR = Color.HSVToRGB(0.8f, 0.5f, 1f);
+        private Vector3 OFF_POS = new(0f, 2f, 0f);
+        private Vector3 ON_POS = new(1f, -2f, 0f);
         
         private void Update()
         {
@@ -20,11 +27,7 @@ namespace Windchime.Tests.Runtime
             if (!(_elapsed > 1)) return;
             _elapsed--;
             _isShaded = !_isShaded;
-            var _ = new Tween<Color>(
-                () => _spriteRenderer.color, 
-                x => _spriteRenderer.color = x, 
-                _isShaded ? SHADED_COLOR : NORMAL_COLOR, 
-                new TweenInfo {Time = 0.5f});
+            transform.TweenPosition(_isShaded ? ON_POS : OFF_POS, new TweenInfo {Time = 0.5f}, false);
         }
     }
 }

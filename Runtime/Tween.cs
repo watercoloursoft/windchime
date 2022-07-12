@@ -1,66 +1,67 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Windchime.Runtime
 {
     public interface ITween
     {
-        public void Update();
+        
+        public void Update(float deltaTime);
+        public bool IsDone();
     }
     
-    public struct Tween<T> : ITween where T : IEquatable<T>
+    public struct Tween<T> : ITween
     {
         public delegate T Getter();
         public delegate void Setter(T value);
         
-        private readonly TweenInfo _tweenInfo;
+        private TweenInfo _tweenInfo;
 
-        private readonly T _goal;
-        private readonly T _startValue;
-        private T _currentValue;
-        private readonly Setter _setter;
+        private T _goal;
+        private T _startValue;
+        private  Setter _setter;
         
-        private readonly float _tweenDuration;
-        private readonly float _tweenStartTIme;
+        private float _tweenDuration;
+        private float _tweenElapsed;
         private bool _animating;
 
-        public Tween(Getter getter, Setter setter, T goal, TweenInfo tweenInfo)
+        public void Play(Getter getter, Setter setter, T goal, TweenInfo tweenInfo)
         {
+            if (_animating)
+                return;
             _tweenInfo = tweenInfo;
 
             _goal = goal;
             _startValue = getter();
-            _currentValue = _startValue;
             _setter = setter;
 
             var tweenDuration = _tweenInfo.CycleDuration;
             tweenDuration *= _tweenInfo.RepeatCount + 1;
             _tweenDuration = tweenDuration;
             
-            _tweenStartTIme = Time.realtimeSinceStartup;
+            _tweenElapsed = 0;
             _animating = true;
-            
-            TweenScheduler.Add(this);
         }
 
-        public void Update()
+        public bool IsDone()
         {
-            var elapsedTime = Time.realtimeSinceStartup - _tweenStartTIme;
+            return !_animating;
+        }
+
+        public void Update(float deltaTime)
+        {
+            var elapsedTime = _tweenElapsed += deltaTime;
             if (elapsedTime > _tweenDuration)
             {
-                _currentValue = _goal;
+                _setter(_goal);
                 _animating = false;
-                TweenScheduler.Remove(this);
             }
             else
             {
                 var ratio = (float)_tweenInfo.GetTweenRatio(elapsedTime);
                 var currentValue = Lerp.LerpType(_startValue, _goal, ratio);
-                _currentValue = currentValue;
+                _setter(currentValue);
                 _animating = true;
             }
-
-            _setter(_currentValue);
         }
     }
 }
